@@ -275,6 +275,10 @@ def run(tracking_uri: str = "http://127.0.0.1:5000"):
             mlflow.sklearn.log_model(
                 sk_model=fitted[name], name=f"{name}_pipeline",
                 input_example=X_train.head(2),
+                # MLflow 3.17.1 skops rechaza numpy.dtype en pipelines.
+                # cloudpickle es apto para este entorno académico controlado;
+                # nunca cargar serializaciones de fuentes no confiables.
+                serialization_format="cloudpickle",
                 registered_model_name=f"PM_Actividad5_{name}",
             )
             mlflow.log_artifact(str(OUT / "calidad_datos.json"), artifact_path="data")
