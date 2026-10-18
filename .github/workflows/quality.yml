@@ -1,0 +1,34 @@
+name: Calidad de codigo y preparacion de datos
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+      - name: Preparar Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Verificar sintaxis
+        run: python -m compileall -q fuentes tests
+      - name: Pruebas unitarias
+        run: python -m unittest discover -s tests -v
+      - name: Verificar datos y generar EDA
+        run: python -m fuentes.datos_prep
+      - name: Revisar artefactos de calidad
+        run: |
+          python -c "from pathlib import Path; import json; q=json.loads(Path('resultados/calidad_datos.json').read_text()); assert q['filas']==10000 and q['duplicados_exactos']==0 and sum(q['nulos_por_variable'].values())==0; print('Calidad del dataset verificada')"
+      - name: Importar motor MLflow y PDF
+        run: python -c "import fuentes.train, fuentes.generar_reporte; print('Dependencias listas')"
