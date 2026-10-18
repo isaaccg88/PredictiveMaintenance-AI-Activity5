@@ -159,7 +159,6 @@ def run(tracking_uri: str = "http://127.0.0.1:5000"):
 
     source_data, split, quality = prepare_data(make_figures=True)
     by_id = source_data.set_index("indice_original")
-    labels = split.set_index("conjunto")["indice_original"].to_dict()
     # La selección por particiones conserva exclusivamente los IDs asignados.
     ids = {k: split.loc[split["conjunto"] == k, "indice_original"].to_numpy()
            for k in ("train", "validation", "test")}
@@ -181,6 +180,20 @@ def run(tracking_uri: str = "http://127.0.0.1:5000"):
     fitted = {}
     run_ids = {}
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)
+
+    # Baseline: tasa de clase mayoritaria, sin Grid Search ni filtraciones.
+    # No participa en la elección entre los dos algoritmos exigidos.
+    dummy = DummyClassifier(strategy="prior")
+    dummy.fit(X_train, y_train)
+    dummy_val = scores(y_val, dummy.predict_proba(X_val)[:, 1], 0.5)
+    with mlflow.start_run(run_name="DummyClassifier_baseline") as baseline_run:
+        baseline_run_id = baseline_run.info.run_id
+        mlflow.set_tags({"actividad": "5", "algoritmo": "DummyClassifier",
+                         "fase": "baseline", "version_dataset": "A5-v1"})
+        mlflow.log_params({"modelo": "DummyClassifier", "strategy": "prior",
+                           "umbral": 0.5, "semilla": SEED})
+        mlflow.log_metrics({"validation_" + k: float(v)
+                            for k, v in dummy_val.items() if k != "threshold"})
 
     for name in ("LogisticRegression", "RandomForest"):
         model, grid_params = pipeline_and_grid(name)
@@ -302,13 +315,23 @@ def run(tracking_uri: str = "http://127.0.0.1:5000"):
         "criterio": "F2 en validación con precision>=0.50 si es factible",
         "fecha_utc": datetime.now(timezone.utc).isoformat(),
         "metadata": metadata,
-        "runs_mlflow": run_ids,
+        "runs_mlflow": {**run_ids, "DummyClassifier": baseline_run_id},
     }
     (OUT / "seleccion_congelada.json").write_text(
         json.dumps(decisions, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
 
     # PRUEBA FINAL: ningún GridSearchCV ni selección utiliza test.
+    baseline_test = scores(y_test, dummy.predict_proba(X_test)[:, 1], 0.5)
+    with mlflow.start_run(run_id=baseline_run_id):
+        mlflow.log_metrics({"test_" + k: float(v)
+                            for k, v in baseline_test.items() if k != "threshold"})
+    (OUT / "baseline_dummy.json").write_text(
+        json.dumps({"run_id": baseline_run_id,
+                    "validation": dummy_val, "test": baseline_test},
+                   ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+
     pred_df = pd.DataFrame({
         "indice_original": ids["test"], "valor_real": y_test.to_numpy()
     })
@@ -356,7 +379,7 @@ def run(tracking_uri: str = "http://127.0.0.1:5000"):
     (OUT / "resumen_experimento.json").write_text(
         json.dumps({
             "campeon": champion, "umbral": champion_threshold, "metadata": metadata,
-            "resultados": results, "experiment_name": EXPERIMENT_NAME,
+            "resultados": results, "baseline": baseline_test, "experiment_name": EXPERIMENT_NAME,
             "tracking_uri": tracking_uri
         }, ensure_ascii=False, indent=2, default=str) + "\n",
         encoding="utf-8",
