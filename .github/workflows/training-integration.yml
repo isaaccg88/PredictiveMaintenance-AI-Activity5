@@ -28,6 +28,10 @@ jobs:
         run: python -m fuentes.train --tracking-uri sqlite:///mlflow-ci.db
       - name: Exportar runs del experimento
         run: python -m fuentes.export_evidencias --tracking-uri sqlite:///mlflow-ci.db
+      - name: Generar PDF preliminar y validar contenido
+        run: |
+          python -m fuentes.generar_reporte
+          python -c "from pathlib import Path; p=Path('docs/Reporte_Tecnico_Actividad5.pdf'); assert p.is_file() and p.stat().st_size>10000; print('PDF preliminar generado')"
       - name: Comprobar métricas
         run: |
           python -c "import pandas as pd; a=pd.read_csv('resultados/comparacion_modelos.csv'); b=pd.read_csv('evidencias/mlflow/runs_exportados.csv'); assert len(a)==2 and len(b)>=17; assert a['test_f1'].between(0,1).all(); print('Entrenamiento y tracking completos')"
@@ -38,6 +42,7 @@ jobs:
           name: actividad5-integration-results
           path: |
             resultados/
+            docs/Reporte_Tecnico_Actividad5.pdf
             evidencias/mlflow/*.csv
             evidencias/mlflow/*.json
           if-no-files-found: warn
