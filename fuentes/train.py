@@ -364,6 +364,49 @@ def run(tracking_uri: str = "http://127.0.0.1:5000"):
             })
             mlflow.set_tag("seleccionado_en_validacion", str(name == champion))
 
+    # Bootstrap pareado: las dos predicciones se remuestrean sobre los mismos
+    # registros del test; es un análisis descriptivo de incertidumbre.
+    rng = np.random.default_rng(SEED)
+    a, b = output["LogisticRegression"], output["RandomForest"]
+    y_array = y_test.to_numpy(dtype=int)
+    from sklearn.metrics import f1_score
+    delta_obs = f1_score(y_array, b["labels"], zero_division=0) - (
+        f1_score(y_array, a["labels"], zero_division=0)
+    )
+    delta_boot = []
+    for _ in range(2000):
+        ids_b = rng.integers(0, len(y_array), size=len(y_array))
+        delta_boot.append(
+            f1_score(y_array[ids_b], np.asarray(b["labels"])[ids_b],
+                     zero_division=0)
+            - f1_score(y_array[ids_b], np.asarray(a["labels"])[ids_b],
+                       zero_division=0)
+        )
+    ci_low, ci_high = np.quantile(delta_boot, [0.025, 0.975])
+    boot = pd.DataFrame([{
+        "Comparacion": "RandomForest - LogisticRegression",
+        "metrica": "Diferencia F1 (test)",
+        "delta_observada": float(delta_obs),
+        "IC95_inferior": float(ci_low),
+        "IC95_superior": float(ci_high),
+        "repeticiones": 2000,
+        "semilla": SEED,
+        "metodo": "Bootstrap pareado percentil",
+        "contiene_cero": bool(ci_low <= 0 <= ci_high),
+    }])
+    boot.to_csv(OUT / "bootstrap_pareado.csv", index=False)
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.hist(delta_boot, bins=35)
+    ax.axvline(0, linestyle="--", linewidth=1.5, label="Diferencia cero")
+    ax.axvline(delta_obs, linestyle="-", linewidth=1.5,
+               label=f"Observada = {delta_obs:.3f}")
+    ax.set_title("Figura 10. Bootstrap pareado de diferencia F1 (2,000)")
+    ax.set_xlabel("F1(Random Forest) - F1(Reg. Logistica)")
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(FIG / "10_bootstrap_f1.png", dpi=170)
+    plt.close(fig)
+
     comparison = pd.DataFrame(results)
     comparison.to_csv(OUT / "comparacion_modelos.csv", index=False)
     pred_df.to_csv(OUT / "predicciones_test.csv", index=False)
@@ -373,13 +416,13 @@ def run(tracking_uri: str = "http://127.0.0.1:5000"):
     for name, run_id in run_ids.items():
         with mlflow.start_run(run_id=run_id):
             mlflow.log_artifacts(str(FIG), artifact_path="figuras_finales")
-            for file in ("comparacion_modelos.csv", "predicciones_test.csv",
+            for file in ("bootstrap_pareado.csv", "comparacion_modelos.csv", "predicciones_test.csv",
                          "umbrales_validacion.csv", "seleccion_congelada.json"):
                 mlflow.log_artifact(str(OUT / file), artifact_path="resultados")
     (OUT / "resumen_experimento.json").write_text(
         json.dumps({
             "campeon": champion, "umbral": champion_threshold, "metadata": metadata,
-            "resultados": results, "baseline": baseline_test, "experiment_name": EXPERIMENT_NAME,
+            "resultados": results, "bootstrap": boot.to_dict(orient="records")[0], "baseline": baseline_test, "experiment_name": EXPERIMENT_NAME,
             "tracking_uri": tracking_uri
         }, ensure_ascii=False, indent=2, default=str) + "\n",
         encoding="utf-8",
