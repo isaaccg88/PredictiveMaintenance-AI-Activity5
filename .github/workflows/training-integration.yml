@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - '.github/workflows/training-integration.yml'
+      - 'fuentes/train.py'
+      - 'requirements.txt'
   workflow_dispatch:
 
 jobs:
