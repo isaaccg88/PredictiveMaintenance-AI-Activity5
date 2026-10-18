@@ -1,0 +1,20 @@
+# Entornos de Python y salidas locales
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.env
+*.env
+.DS_Store
+# MLflow, base SQLite y modelos locales (no versionar artefactos binarios grandes)
+mlruns/
+mlartifacts/
+mlflow.db*
+*.sqlite
+*.sqlite3
+*.db
+# Experimentos generados localmente (se publican solo evidencias curadas)
+artifacts/
+outputs/
+# Mantener PNG/SVG y CSV finales versionados en resultados/

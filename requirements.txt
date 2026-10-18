@@ -1,0 +1,8 @@
+# Entorno de referencia del estudiante: Windows, Python 3.13.5
+# Versiones observadas 2026-10-18; preparar venv exclusivo.
+mlflow==3.17.1
+scikit-learn==1.9.1
+pandas==3.0.6
+numpy==2.5.4
+matplotlib==3.11.2
+scipy==1.18.1
