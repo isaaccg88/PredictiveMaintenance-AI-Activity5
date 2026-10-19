@@ -6,8 +6,8 @@
 
 Secciones incluidas:
 1. Portada, resumen ejecutivo, alcance y objetivos.
-2. Fuente y diccionario de datos, limpieza y versionamiento con SHA256.
-3. Diagnóstico de datos desbalanceados, variables extremas y figuras.
+2. Fuente y diccionario de datos, archivo oficial UCI de 14 columnas, verificación fila a fila del snapshot de 7 columnas, limpieza y hashes SHA256.
+3. Diagnóstico de datos desbalanceados, completitud, valores extremos, figuras 1–4 reordenadas e interpretación individual.
 4. Validación cruzada, Grid Search, selección de hiperparámetros.
 5. Evidencias de MLflow: runs, panel, modelos y artefactos.
 6. Comparación numérica y visual de modelos, matrices de confusión, PR y ROC.
@@ -16,3 +16,5 @@ Secciones incluidas:
 9. Conclusiones, referencias, declaración de uso de ChatGPT y reproducibilidad.
 
 Se conserva el generador reproducible en `fuentes/generar_reporte.py`; al volver a ejecutarlo, corresponde actualizar resultados, capturas y reporte juntos.
+
+**Evidencia adicional:** [notebook auditor ejecutado](../fuentes/Evidencia_Ejecutada_Actividad5.ipynb), con seis celdas de código y resultados reales verificados sin reentrenamiento. La plantilla de entrenamiento principal se conserva en `fuentes/entrena.ipynb`.
