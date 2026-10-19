@@ -1,7 +1,13 @@
-# Datos iniciales — AI4I 2020
+# Datos iniciales — AI4I 2020 (original y snapshot)
 
-Archivo: `ai4i2020.csv` (10,000 filas, siete columnas): `Type`, `Air temperature`, `Process temperature`, `Rotational speed`, `Torque`, `Tool wear`, `Machine failure`.
+**Fuente original oficial:** [AI4I 2020 Predictive Maintenance Dataset, UCI Repository, ID 601](https://archive.ics.uci.edu/dataset/601/ai4i+2020+predictive+maintenance+dataset), DOI [10.24432/C5HS5C](https://doi.org/10.24432/C5HS5C), licencia CC BY 4.0. Es un dataset **sintético**, no observaciones industriales verificadas.
 
-**Procedencia exacta:** copia byte a byte del snapshot académico de `datos/ai4i2020.csv` de la [Actividad 4](https://github.com/isaaccg88/PredictiveMaintenance-AI-Activity4/blob/main/data/ai4i2020.csv). Deriva del [AI4I 2020 Predictive Maintenance Dataset de UCI](https://doi.org/10.24432/C5HS5C) (CC BY 4.0), **no contiene todas las columnas originales del archivo UCI**. Esta distinción evita declarar como bruto un subconjunto ya seleccionado.
+| Archivo | Filas × columnas | Finalidad |
+|---|---:|---|
+| [`uci_ai4i2020_original.csv`](uci_ai4i2020_original.csv) | 10,000 × 14 | Descarga íntegra del CSV oficial UCI; no se utiliza para reentrenar |
+| [`ai4i2020.csv`](ai4i2020.csv) | 10,000 × 7 | Snapshot académico de la Actividad 4 utilizado realmente para entrenar |
+| [`../splits.csv`](../splits.csv) | 10,000 × 3 | Particiones congeladas de entrenamiento, validación y prueba |
 
-El archivo queda congelado como versión de origen de la Actividad 5. Las transformaciones reproducibles se aplican separadamente y se documentan en `datos/datos_limp/` y `docs/protocolo_experimental.md`.
+**Correspondencia demostrada:** [`fuentes/verificar_fuente_uci.py`](../../fuentes/verificar_fuente_uci.py) cotejó las siete variables **fila por fila** (0 diferencias). Consulta el [manifiesto verificable con hashes](../../docs/uci_source_manifest.json).
+
+Las columnas `UDI` y `Product ID` se excluyeron por tratarse de identificadores; `TWF`, `HDF`, `PWF`, `OSF`, `RNF` se excluyeron por representar modos de falla y filtrarían información del objetivo. El subconjunto conserva Type, las cinco variables numéricas y Machine failure. El snapshot no sufrió modificaciones al añadir el origen: por tanto, los resultados de MLflow siguen siendo los originales.
