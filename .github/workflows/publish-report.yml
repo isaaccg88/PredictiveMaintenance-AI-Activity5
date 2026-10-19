@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - '.github/workflows/publish-report.yml'
+      - 'fuentes/generar_reporte.py'
+      - 'docs/uci_source_manifest.json'
   workflow_dispatch:
 
 permissions:
