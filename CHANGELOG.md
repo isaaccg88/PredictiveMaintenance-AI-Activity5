@@ -13,7 +13,7 @@
 - Modelo ganador seleccionado antes de test: **RandomForest** (umbral 0.20, F2 validación 0.7143). En test F1 0.6341, recall 0.7647, AP 0.7518, 39 verdaderos positivos, 12 falsos negativos y 33 falsos positivos.
 - Se calculó bootstrap pareado: delta F1 respecto de regresión logística = 0.2245, IC95 percentil [0.0897, 0.3668] con 2,000 remuestreos.
 - Se incorporaron ocho figuras descriptivas/comparativas y seis capturas auténticas del panel de MLflow, publicadas junto con métricas y predicciones.
-- Se generó y verificó el [**reporte técnico PDF**](docs/Reporte_Tecnico_Actividad5.pdf): 11 páginas y 14 imágenes, auditadas mediante GitHub Actions.
+- Se generó y verificó el [**reporte técnico PDF**](docs/Reporte_Tecnico_Actividad5.pdf): 12 páginas y 14 imágenes, auditadas mediante GitHub Actions.
 - Se documentaron análisis cuantitativos, desbalance, riesgos de sobreajuste, deuda técnica, MLOps y declaración de uso de ChatGPT.
 
 ## 2026-10-18 — Inicialización y protocolo
