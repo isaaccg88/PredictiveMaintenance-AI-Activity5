@@ -133,8 +133,10 @@ def document(require_screenshots: bool = False) -> Path:
         if h > 11*cm:
             h = 11*cm
             width = h * width_px / height_px
-        story.append(Image(str(file), width=width, height=h))
-        caption(title)
+        story.append(KeepTogether([
+            Image(str(file), width=width, height=h),
+            p(title, styles["CaptionA5"])
+        ]))
 
     story += [Spacer(1, 2.1*cm),
               p("Predictive Maintenance AI", styles["CoverTitle"]),
@@ -142,7 +144,10 @@ def document(require_screenshots: bool = False) -> Path:
                 styles["SubA5"]),
               Spacer(1, .35*cm)]
     para("Módulo 2 / Semana 6 | Entrenamiento, búsqueda de hiperparámetros y trazabilidad con MLflow")
-    para("Universidad Tecmilenio | Dataset AI4I 2020, UCI | Entorno: Windows / Python 3.13.5 / MLflow 3.17.1")
+    para("Universidad Tecmilenio | Módulo 2 / Semana 6 | Responsable: @isaaccg88")
+    para("Entrega académica: enlace a repositorio público de GitHub con PDF, código, datos y evidencias MLflow.")
+    para("Experimento ejecutado en Windows 11 | Python 3.13.5 | scikit-learn 1.9.1 | MLflow 3.17.1")
+    para("Fecha del experimento: 18 de octubre de 2026 | Fuente: UCI AI4I 2020, DOI 10.24432/C5HS5C.")
     para(f"Modelo seleccionado antes del test: <b>{txt(decisions['modelo_seleccionado'])}</b>; "
          f"umbral validado: <b>{decisions['umbral_congelado']:.2f}</b>.")
     para("Documento generado a partir de resultados y evidencias reales. "
@@ -180,6 +185,29 @@ def document(require_screenshots: bool = False) -> Path:
         ["Machine failure", "Variable objetivo: 1=falla, 0=sin falla."],
     ], widths=[4.8*cm, 11.5*cm])
     header("3. Gestión, limpieza y versionamiento")
+    provenance_file = ROOT / "docs/uci_source_manifest.json"
+    if provenance_file.exists():
+        provenance = json.loads(provenance_file.read_text(encoding="utf-8"))
+        if provenance.get("comparacion_fila_a_fila") != "APROBADA":
+            raise ValueError("El snapshot no está validado contra el origen UCI.")
+        para("PROCEDENCIA VERIFICADA: además del snapshot de siete columnas usado "
+             "en el entrenamiento, se versiona el archivo oficial UCI de "
+             f"{provenance['original_filas']:,} filas y "
+             f"{provenance['original_columnas']} columnas. La comparación "
+             "fila por fila de las siete variables utilizadas produjo "
+             "cero discrepancias. Se excluyeron UDI y Product ID por ser "
+             "identificadores y TWF, HDF, PWF, OSF y RNF por representar "
+             "modos de falla directamente vinculados al objetivo; incluirlos "
+             "supondría fuga de información de la etiqueta.")
+        para("SHA256 archivo original de UCI: "
+             + provenance["sha256_original_uci"] + ".")
+        table(["Elemento", "Evidencia de trazabilidad"], [
+            ["Fuente primaria", "UCI AI4I 2020, DOI 10.24432/C5HS5C, CC BY 4.0"],
+            ["Archivo completo", "datos/datos_ini/uci_ai4i2020_original.csv (14 columnas)"],
+            ["Snapshot del entrenamiento", "datos/datos_ini/ai4i2020.csv (7 columnas)"],
+            ["Comparación", "10,000 filas y siete columnas: 0 discrepancias"],
+            ["Registro verificable", "docs/uci_source_manifest.json; fuentes/verificar_fuente_uci.py"],
+        ], widths=[5.3*cm, 11*cm])
     para(f"Snapshot: {quality['filas']:,} registros; "
          f"clases {txt(quality['clases'])}. "
          f"Duplicados exactos: {quality['duplicados_exactos']}. "
@@ -197,14 +225,17 @@ def document(require_screenshots: bool = False) -> Path:
         for x in quality["iqr_outliers_por_variable"]
     ], widths=[9*cm, 7.3*cm])
     figure("01_balance_clases.png",
-           "Figura 1. Distribución de la clase objetivo: enfatiza la necesidad de métricas no dominadas por la clase mayoritaria.")
-    figure("03_distribuciones.png",
-           "Figura 3. Variables por clase: patrones descriptivos que no implican causalidad.")
-
+           "Figura 1. Distribución de clases: 9,661 registros sin falla y 339 con falla; un baseline mayoritario alcanza 96.61 por ciento de accuracy sin detectar fallas.")
+    para("INTERPRETACIÓN DE LA FIGURA 1: la prevalencia de fallas de 3.39 por ciento exige Average Precision, recall, F1/F2 y revisión de matrices de confusión; accuracy por sí sola no es adecuada.")
     figure("02_nulos.png",
-           "Figura 2. Auditoría de faltantes: ningún campo presenta nulos; no fue necesaria imputación en esta muestra, aunque el pipeline la soporta.")
+           "Figura 2. Diagnóstico de valores faltantes: cero nulos en las seis características.")
+    para("INTERPRETACIÓN DE LA FIGURA 2: en este snapshot no se requirió imputar datos; aun así, el pipeline mantiene SimpleImputer dentro de cada fold para conservar un proceso seguro ante futuras entradas incompletas.")
+    figure("03_distribuciones.png",
+           "Figura 3. Histogramas de variables numéricas según etiqueta de falla: diferencias descriptivas, no causales.")
+    para("INTERPRETACIÓN DE LA FIGURA 3: se comparan distribuciones normalizadas por clase, evitando que los 9,661 negativos oculten los 339 positivos. Estas diferencias no implican anticipación temporal ni generalización entre máquinas.")
     figure("04_tipos_falla.png",
-           "Figura 4. Tasa de fallo según tipo de producto: diferencias descriptivas; no demuestran causalidad y deben contrastarse con datos reales.")
+           "Figura 4. Proporción de falla por categoría Type (L/M/H): diagnóstico descriptivo.")
+    para("INTERPRETACIÓN DE LA FIGURA 4: se comparan tasas por tipo de producto, no volúmenes absolutos. La variable es categórica y se codifica con OneHotEncoder ajustado dentro de cada fold, no mediante una conversión ordinal arbitraria.")
     para("ANÁLISIS DE CALIDAD: 339 de 10,000 registros son positivos (3.39%). "
          "La clase mayoritaria alcanza 96.61%, por lo que accuracy aislada "
          "es engañosa. No existen valores nulos ni duplicados exactos. "
@@ -399,6 +430,11 @@ def document(require_screenshots: bool = False) -> Path:
          "python -m fuentes.train y después "
          "python -m fuentes.export_evidencias. "
          "Los umbrales quedan congelados antes de calcular prueba.")
+    para("DOCUMENTACIÓN COMPLEMENTARIA: fuentes/Evidencia_Ejecutada_Actividad5.ipynb "
+         "contiene verificaciones ejecutadas sin volver a entrenar; "
+         "fuentes/entrena.ipynb y fuentes/train.py contienen el procedimiento "
+         "reproducible de entrenamiento. El CSV original UCI y el manifiesto "
+         "de correspondencia completan la procedencia del dataset.")
     para("La actividad cubre un flujo académico de MLOps; NO se valida "
          "tiempo hasta fallo, sensores reales, desgaste por activo, "
          "causalidad, deriva futura, eficiencia bajo carga productiva "
