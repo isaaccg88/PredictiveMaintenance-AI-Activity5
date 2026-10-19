@@ -1,21 +1,16 @@
-# Evidencias reales del panel MLflow — Actividad 5
+# Evidencia auténtica de MLflow — Actividad 5
 
-El experimento `PredictiveMaintenance_Actividad5` contiene **17 runs reales**: 1 baseline DummyClassifier, 2 runs principales y 14 combinaciones de Grid Search. Como no caben todos en una sola pantalla, el listado se documenta mediante **dos o tres capturas consecutivas**, sin manipular su contenido.
+**Estado:** los siguientes archivos PNG están publicados y proceden del servidor MLflow 3.17.1 ejecutado en Windows, no son imágenes simuladas ni generadas por IA.
 
-## Capturas del listado de 17 runs (misma pantalla y experimento)
+| Captura | Evidencia |
+|---|---|
+| `01_experimentos.png` | Listado de runs, parte superior |
+| `01_experimentos_02.png` | Listado de runs, parte intermedia |
+| `01_experimentos_03.png` | Listado de runs, parte inferior |
+| `02_gridsearch_parametros.png` | Parámetros y medias de validación cruzada de un candidato de Random Forest |
+| `03_comparacion_runs.png` | Comparación de runs padres, métricas F1/recall/precision/AP |
+| `04_modelos_artefactos.png` | Archivos, figuras y tablas guardadas en el run de Random Forest |
 
-- `01_experimentos.png` — parte **superior**; nombre del experimento, contador de 17 runs y grupo RandomForest.
-- `01_experimentos_02.png` — continuación central; mismas columnas y runs adicionales al desplazarse.
-- `01_experimentos_03.png` — parte **inferior**; ejecuciones de regresión logística y DummyClassifier.
+El CSV `runs_exportados.csv` y el manifiesto `runs_manifest.json` documentan **17 runs** (1 baseline, 2 padres y 14 combinaciones de hiperparámetros). El manifiesto fue exportado antes de adjuntar las capturas; su nota de capturas pendientes corresponde exclusivamente al momento de exportación, no al estado actual del repositorio.
 
-Las dos continuaciones son opcionales para el generador PDF, pero **se recomiendan ambas** para demostrar el listado completo. Mantener igual el filtro, el experimento y las columnas; desplazar únicamente la tabla verticalmente. El reporte añade automáticamente las capturas adicionales que existan.
-
-## Otras evidencias obligatorias
-
-- `02_gridsearch_parametros.png` — una ejecución hija de Grid Search mostrando hiperparámetros y métricas CV.
-- `03_comparacion_runs.png` — comparación de los modelos principales, con columnas de F1, recall y AP.
-- `04_modelos_artefactos.png` — vista de los modelos registrados o de los artefactos guardados en uno de los runs.
-
-Guardar imágenes **PNG auténticas**, sin fabricar pantallas ni alterar métricas. Las capturas solo complementan `runs_exportados.csv` y `runs_manifest.json`, donde se conservan los registros estructurados de MLflow.
-
-El panel está disponible en **http://127.0.0.1:5000** únicamente en el equipo del estudiante; el profesor no podrá acceder a esa dirección desde GitHub. No incluir contraseñas, tokens, bases de datos privadas ni artefactos de ejecución innecesariamente voluminosos.
+Los seis PNG están incorporados en [docs/Reporte_Tecnico_Actividad5.pdf](../../docs/Reporte_Tecnico_Actividad5.pdf). El panel `http://127.0.0.1:5000` solo puede abrirse en el equipo del estudiante; no se publican tokens ni la base SQLite local.
