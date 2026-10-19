@@ -91,7 +91,7 @@ Abre el repositorio con **GitHub Desktop > Repository > Show in Explorer**. En e
 & "$HOME\MLflow-Actividad5\.venv\Scripts\python.exe" -m fuentes.export_evidencias --tracking-uri http://127.0.0.1:5000
 ```
 
-**5.5. Capturar el panel MLflow.** Abre http://127.0.0.1:5000, selecciona **Model training** y guarda cuatro capturas reales según [evidencias/mlflow/README.md](evidencias/mlflow/README.md). El profesor no puede abrir el localhost de tu equipo.
+**5.5. Capturar el panel MLflow.** Abre http://127.0.0.1:5000, selecciona **Model training** y documenta los **17 runs** con 2–3 capturas consecutivas (`01_experimentos.png`, `01_experimentos_02.png`, `01_experimentos_03.png`). Añade también las otras tres evidencias técnicas de Grid Search, comparación y modelos; instrucciones en [evidencias/mlflow/README.md](evidencias/mlflow/README.md). Las capturas adicionales del listado se incorporan automáticamente al PDF. El profesor no puede abrir el localhost de tu equipo.
 
 **5.6. Crear el PDF con los resultados y capturas obligatorias:**
 

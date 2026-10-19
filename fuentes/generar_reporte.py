@@ -31,6 +31,12 @@ REQUIRED_CAPTURES = [
     "01_experimentos.png", "02_gridsearch_parametros.png",
     "03_comparacion_runs.png", "04_modelos_artefactos.png"
 ]
+# Capturas adicionales opcionales del listado de 17 runs, en orden de scroll.
+# Se incorporan automáticamente al PDF cuando están presentes.
+EXTRA_RUNS_CAPTURES = [
+    "01_experimentos_02.png",
+    "01_experimentos_03.png",
+]
 TEAL = colors.HexColor("#147A87")
 DARK = colors.HexColor("#193240")
 MUTED = colors.HexColor("#5E717A")
@@ -208,14 +214,29 @@ def document(require_screenshots: bool = False) -> Path:
     if missing_captures:
         para("<b>Advertencia:</b> faltan capturas de la interfaz real de MLflow: "
              + txt(", ".join(missing_captures)) + ". Este PDF es preliminar.")
-    for i, filename in enumerate(REQUIRED_CAPTURES, start=1):
+    # Mostrar el listado completo primero, seguido de GridSearch, comparación y modelos.
+    capture_sequence = [
+        ("01_experimentos.png", "Evidencia MLflow 1a. Listado de runs: parte superior."),
+        ("01_experimentos_02.png", "Evidencia MLflow 1b. Listado de runs: continuación."),
+        ("01_experimentos_03.png", "Evidencia MLflow 1c. Listado de runs: tramo inferior."),
+        ("02_gridsearch_parametros.png", "Evidencia MLflow 2. Hiperparámetros de Grid Search."),
+        ("03_comparacion_runs.png", "Evidencia MLflow 3. Comparación entre modelos."),
+        ("04_modelos_artefactos.png", "Evidencia MLflow 4. Modelos registrados y artefactos.")
+    ]
+    for filename, description in capture_sequence:
         file = EVIDENCE / filename
         if file.exists():
             from reportlab.lib.utils import ImageReader
             wp, hp = ImageReader(str(file)).getSize()
-            w = 15.4*cm
-            story.append(Image(str(file), width=w, height=min(10*cm, w*hp/wp)))
-            caption(f"Evidencia MLflow {i}. Captura real del seguimiento experimental.")
+            width = 15.4*cm
+            height = width * hp / wp
+            if height > 10*cm:
+                height = 10*cm
+                width = height * wp / hp
+            story.append(KeepTogether([
+                Image(str(file), width=width, height=height),
+                p(description, styles["CaptionA5"])
+            ]))
     header("6. Desempeño y contraste de modelos sobre prueba")
     table(["Modelo", "Precisión", "Recall", "F1", "F2", "AP", "ROC-AUC"], [
         [row["Modelo"], f"{row['test_precision']:.3f}",
