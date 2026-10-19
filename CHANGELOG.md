@@ -1,5 +1,11 @@
 # Registro de cambios — Actividad 5
 
+## 2026-10-18 — Mejoras posteriores a la auditoría de rúbrica
+- Incorporación del CSV original completo UCI AI4I 2020 (14 columnas), licencia y manifiesto SHA256; comprobación fila a fila frente al snapshot académico de 7 columnas (0 discrepancias), sin modificar el experimento.
+- Cuaderno complementario `fuentes/Evidencia_Ejecutada_Actividad5.ipynb` con validaciones ejecutables de integridad, resultados, bootstrap y 17 runs, distinto de la plantilla de entrenamiento.
+- Corrección del orden/captions de figuras 1–4, interpretación independiente de cada gráfico, mayor detalle de trazabilidad y actualización de portada y reporte PDF.
+- Conservación de la rama de respaldo `respaldo-actividad5-previo-a-auditoria-final` antes de estos cambios.
+
 ## 2026-10-18 — Entrenamiento ejecutado y evidencia final (versión de entrega)
 - Se entrenaron en Windows 11, Python 3.13.5, **regresión logística** y **Random Forest** con GridSearchCV de cinco folds estratificados; se añadió DummyClassifier como baseline.
 - Se guardaron 17 ejecuciones reales en MLflow 3.17.1 (14 candidatos, 2 principales y 1 baseline), con modelos registrados, artefactos y tabla CSV exportada.
