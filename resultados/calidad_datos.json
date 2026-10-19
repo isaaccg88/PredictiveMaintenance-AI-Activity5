@@ -1,0 +1,46 @@
+{
+  "dataset": "AI4I 2020, snapshot academico de siete columnas",
+  "origen": "Actividad 4, data/ai4i2020.csv (derivado de UCI 601)",
+  "licencia": "CC BY 4.0",
+  "filas": 10000,
+  "columnas_predictoras": [
+    "Type",
+    "Air temperature",
+    "Process temperature",
+    "Rotational speed",
+    "Torque",
+    "Tool wear"
+  ],
+  "clases": {
+    "0": 9661,
+    "1": 339
+  },
+  "duplicados_exactos": 0,
+  "categoria_tipo_invalida": 0,
+  "nulos_por_variable": {
+    "indice_original": 0,
+    "Type": 0,
+    "Air temperature": 0,
+    "Process temperature": 0,
+    "Rotational speed": 0,
+    "Torque": 0,
+    "Tool wear": 0,
+    "Machine failure": 0
+  },
+  "iqr_outliers_por_variable": {
+    "Air temperature": 0,
+    "Process temperature": 0,
+    "Rotational speed": 418,
+    "Torque": 69,
+    "Tool wear": 0
+  },
+  "split": {
+    "train": 7000,
+    "validation": 1500,
+    "test": 1500
+  },
+  "politica": "sin borrar registros validos; imputation, onehot y scaler solo en pipeline por fold",
+  "sha256_origen": "7d266d84d3478c11de16c1764f4d0edd77f85880deef3899b934e7622c007a8a",
+  "sha256_splits": "4523ba7ed0f0285a932b4f2931678b7c148a1737d62f045bfcbdad42755004e4",
+  "sha256_preparado": "36099b87dff481812b9c034f575c1e831c3b4f6a36d54c4d44c80979066880f2"
+}

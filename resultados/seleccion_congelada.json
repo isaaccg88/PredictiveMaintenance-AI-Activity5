@@ -1,0 +1,24 @@
+{
+  "modelo_seleccionado": "RandomForest",
+  "umbral_congelado": 0.2,
+  "criterio": "F2 en validación con precision>=0.50 si es factible",
+  "fecha_utc": "2026-10-18T23:50:11.153585+00:00",
+  "metadata": {
+    "dataset_sha256": "7d266d84d3478c11de16c1764f4d0edd77f85880deef3899b934e7622c007a8a",
+    "splits_sha256": "4523ba7ed0f0285a932b4f2931678b7c148a1737d62f045bfcbdad42755004e4",
+    "prepared_sha256": "36099b87dff481812b9c034f575c1e831c3b4f6a36d54c4d44c80979066880f2",
+    "seed": 42,
+    "cv_folds": 5,
+    "scoring_cv": "average_precision",
+    "data_source": "UCI AI4I 2020; subset 7 columnas Actividad4",
+    "python_version": "3.13.5",
+    "sklearn_version": "1.9.1",
+    "mlflow_version": "3.17.1",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "runs_mlflow": {
+    "LogisticRegression": "88307e3b2a794c468f8463c806470924",
+    "RandomForest": "7ddfe0f938174ee0870de2d94b76328a",
+    "DummyClassifier": "6f75d19614fc47d3a87edf7272c5db53"
+  }
+}

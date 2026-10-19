@@ -1,0 +1,2 @@
+Comparacion,metrica,delta_observada,IC95_inferior,IC95_superior,repeticiones,semilla,metodo,contiene_cero
+RandomForest - LogisticRegression,Diferencia F1 (test),0.22450778724654719,0.08967261904761901,0.36681427515233545,2000,42,Bootstrap pareado percentil,False

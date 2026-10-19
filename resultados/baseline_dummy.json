@@ -1,0 +1,33 @@
+{
+  "run_id": "6f75d19614fc47d3a87edf7272c5db53",
+  "validation": {
+    "accuracy": 0.966,
+    "balanced_accuracy": 0.5,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "f2": 0.0,
+    "average_precision": 0.034,
+    "roc_auc": 0.5,
+    "tp": 0,
+    "fp": 0,
+    "tn": 1449,
+    "fn": 51,
+    "threshold": 0.5
+  },
+  "test": {
+    "accuracy": 0.966,
+    "balanced_accuracy": 0.5,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "f2": 0.0,
+    "average_precision": 0.034,
+    "roc_auc": 0.5,
+    "tp": 0,
+    "fp": 0,
+    "tn": 1449,
+    "fn": 51,
+    "threshold": 0.5
+  }
+}

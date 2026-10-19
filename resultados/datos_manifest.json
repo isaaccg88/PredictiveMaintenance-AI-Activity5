@@ -1,0 +1,8 @@
+{
+  "dataset": "AI4I 2020, snapshot academico de siete columnas",
+  "filas": 10000,
+  "sha256_origen": "7d266d84d3478c11de16c1764f4d0edd77f85880deef3899b934e7622c007a8a",
+  "sha256_splits": "4523ba7ed0f0285a932b4f2931678b7c148a1737d62f045bfcbdad42755004e4",
+  "sha256_preparado": "36099b87dff481812b9c034f575c1e831c3b4f6a36d54c4d44c80979066880f2",
+  "politica": "sin borrar registros validos; imputation, onehot y scaler solo en pipeline por fold"
+}
