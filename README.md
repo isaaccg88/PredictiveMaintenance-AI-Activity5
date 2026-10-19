@@ -9,7 +9,9 @@
 Clasificación binaria de **fallas presentes** en máquinas sintéticas mediante Regresión Logística y Random Forest. Se realiza limpieza trazable, GridSearchCV, validación cruzada estratificada, MLflow, comparación estadística y análisis de deuda MLOps. No se afirma capacidad de anticipar fallas futuras ni validez en producción.
 
 ## 2. Datos y versión
-Snapshot académico de siete columnas derivado de [AI4I 2020, UCI, DOI 10.24432/C5HS5C](https://doi.org/10.24432/C5HS5C), licencia CC BY 4.0; conservado de la [Actividad 4](https://github.com/isaaccg88/PredictiveMaintenance-AI-Activity4). **No es el archivo completo original de UCI**. Está publicado en [datos/datos_ini/ai4i2020.csv](datos/datos_ini/ai4i2020.csv), congelado, junto con [datos/splits.csv](datos/splits.csv).
+**La carpeta de datos iniciales contiene dos versiones trazables:** el [CSV oficial completo de UCI (14 columnas)](datos/datos_ini/uci_ai4i2020_original.csv), descargado de [AI4I 2020 (DOI 10.24432/C5HS5C)](https://doi.org/10.24432/C5HS5C) bajo licencia CC BY 4.0, y el [snapshot académico de siete columnas](datos/datos_ini/ai4i2020.csv) conservado de la [Actividad 4](https://github.com/isaaccg88/PredictiveMaintenance-AI-Activity4). El experimento utiliza solamente seis variables predictoras y la etiqueta binaria, con las [particiones originales congeladas](datos/splits.csv). No se modificó el entrenamiento para incorporar el CSV adicional.
+
+**Validación de procedencia:** el script [`verificar_fuente_uci.py`](fuentes/verificar_fuente_uci.py) comprobó **10,000 filas × siete columnas, cero discrepancias fila por fila** entre el dataset original y el snapshot utilizado. El [manifiesto de procedencia](docs/uci_source_manifest.json) conserva los SHA256, nombres exactos y el mapa de variables. Se excluyeron `UDI` y `Product ID` por ser identificadores y `TWF/HDF/PWF/OSF/RNF` porque describen modos de falla directamente ligados a la etiqueta y supondrían fuga de información si se usaran para predecirla.
 
 | Comprobación inicial | Valor confirmado |
 |---|---:|
@@ -85,7 +87,8 @@ La matriz de confusión es el argumento central: Random Forest identificó **22 
 | [fuentes/datos_prep.py](fuentes/datos_prep.py) | Limpieza, calidad, hashes y EDA |
 | [fuentes/train.py](fuentes/train.py) | Modelos, Grid Search, selección y MLflow |
 | [fuentes/evaluation.py](fuentes/evaluation.py) | Métricas y umbrales |
-| [fuentes/entrena.ipynb](fuentes/entrena.ipynb) | Notebook Jupyter / Colab |
+| [fuentes/entrena.ipynb](fuentes/entrena.ipynb) | Notebook de entrenamiento Jupyter / Colab; plantilla reproducible |
+| [fuentes/Evidencia_Ejecutada_Actividad5.ipynb](fuentes/Evidencia_Ejecutada_Actividad5.ipynb) | Notebook de auditoría con salidas reales de ejecución, **sin reentrenar**; comprueba datos, predicciones, bootstrap y runs |
 | [fuentes/export_evidencias.py](fuentes/export_evidencias.py) | Runs MLflow en CSV/JSON |
 | [fuentes/generar_reporte.py](fuentes/generar_reporte.py) | Crea el reporte PDF con cifras reales |
 | [resultados/](resultados/) | CSV, figuras, calidad y bootstrap |
@@ -163,3 +166,7 @@ La entrega acordada es **la URL del repositorio GitHub**, que contendrá código
 - Scikit-learn: https://scikit-learn.org/stable/
 - MLflow Tracking: https://mlflow.org/docs/latest/ml/tracking/
 - Protocolo: [docs/protocolo_experimental.md](docs/protocolo_experimental.md)
+
+## 12. Controles de cierre académico y portabilidad
+
+Se preservó un respaldo de la versión previa a la auditoría en la rama `respaldo-actividad5-previo-a-auditoria-final`. El entrenamiento original y sus métricas no fueron modificados. La evidencia de ejecución del cuaderno `Evidencia_Ejecutada_Actividad5.ipynb` se obtiene auditando los CSV/JSON publicados en un runtime de GitHub Actions independiente; **no sustituye ni pretende simular la ejecución local del notebook de entrenamiento**. Los hashes SHA256 byte a byte pueden cambiar al normalizar finales de línea CRLF/LF entre Windows y Linux, por lo que se distingue la identidad del contenido tabular y la firma de archivos específicos del entorno.
