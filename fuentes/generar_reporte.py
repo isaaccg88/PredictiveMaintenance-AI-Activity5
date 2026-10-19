@@ -199,7 +199,7 @@ def document(require_screenshots: bool = False) -> Path:
     figure("01_balance_clases.png",
            "Figura 1. Distribución de la clase objetivo: enfatiza la necesidad de métricas no dominadas por la clase mayoritaria.")
     figure("03_distribuciones.png",
-           "Figura 2. Variables por clase: patrones descriptivos que no implican causalidad.")
+           "Figura 3. Variables por clase: patrones descriptivos que no implican causalidad.")
 
     figure("02_nulos.png",
            "Figura 2. Auditoría de faltantes: ningún campo presenta nulos; no fue necesaria imputación en esta muestra, aunque el pipeline la soporta.")
@@ -314,11 +314,11 @@ def document(require_screenshots: bool = False) -> Path:
          "y Balanced Accuracy = 0.50. Por tanto, una accuracy "
          "superior a 96% no prueba utilidad del clasificador.")
     figure("05_06_comparacion_modelos.png",
-           "Figura 3. Comparación de validación y prueba; inspeccionar la posible sensibilidad al umbral.")
+           "Figuras 5 y 6. Comparación de validación y prueba; inspeccionar la posible sensibilidad al umbral.")
     figure("07_08_curvas_pr_roc.png",
-           "Figura 4. Precision-Recall y ROC, ambas necesarias por el desbalance del target.")
+           "Figuras 7 y 8. Precision-Recall y ROC, ambas necesarias por el desbalance del target.")
     figure("09_matrices_confusion_test.png",
-           "Figura 5. Matrices de confusión para examinar falsos negativos y falsas alarmas.")
+           "Figura 9. Matrices de confusión para examinar falsos negativos y falsas alarmas.")
 
     header("7. Análisis estadístico e incertidumbre")
     lower, upper = float(bootstrap["IC95_inferior"]), float(bootstrap["IC95_superior"])
@@ -330,7 +330,7 @@ def document(require_screenshots: bool = False) -> Path:
             if lower <= 0 <= upper else
             "El intervalo no incluye cero bajo este procedimiento descriptivo; "
             "no constituye validación industrial ni confirmación fuera de la muestra."))
-    figure("10_bootstrap_f1.png", "Figura 6. Variación de la diferencia F1 por bootstrap pareado.")
+    figure("10_bootstrap_f1.png", "Figura 10. Variación de la diferencia F1 por bootstrap pareado.")
 
 
     para("INCERTIDUMBRE: la diferencia F1 a favor de Random Forest "
