@@ -155,6 +155,16 @@ def document(require_screenshots: bool = False) -> Path:
          "Esta actividad compara regresión logística y random forest entrenados sobre "
          "la misma partición, con GridSearchCV y cinco folds estratificados. "
          "MLflow guarda parámetros, métricas y modelos para reproducibilidad.")
+
+    para("RESULTADOS PRINCIPALES: Random Forest fue seleccionado exclusivamente en "
+         "validación (F2 0.7143, umbral 0.20). En test logró F1 0.6341, "
+         "recall 0.7647 y Average Precision 0.7518. La regresión logística "
+         "obtuvo F1 0.4096, recall 0.3333 y Average Precision 0.4322. "
+         "La mejora operativa se acompaña de más falsas alarmas y mayor "
+         "costo de entrenamiento, discutidos en las secciones 6 y 8.")
+    para("Reproducibilidad: código Python y notebook publicados en GitHub, "
+         "semilla 42, splits congelados, SHA256 y entorno Windows 11 "
+         "con Python 3.13.5, scikit-learn 1.9.1 y MLflow 3.17.1.")
     header("2. Procedencia y diccionario del dataset")
     para("Fuente original: UCI AI4I 2020 Predictive Maintenance Dataset "
          "(DOI 10.24432/C5HS5C, licencia CC BY 4.0). Se parte del snapshot académico "
@@ -190,6 +200,19 @@ def document(require_screenshots: bool = False) -> Path:
            "Figura 1. Distribución de la clase objetivo: enfatiza la necesidad de métricas no dominadas por la clase mayoritaria.")
     figure("03_distribuciones.png",
            "Figura 2. Variables por clase: patrones descriptivos que no implican causalidad.")
+
+    figure("02_nulos.png",
+           "Figura 2. Auditoría de faltantes: ningún campo presenta nulos; no fue necesaria imputación en esta muestra, aunque el pipeline la soporta.")
+    figure("04_tipos_falla.png",
+           "Figura 4. Tasa de fallo según tipo de producto: diferencias descriptivas; no demuestran causalidad y deben contrastarse con datos reales.")
+    para("ANÁLISIS DE CALIDAD: 339 de 10,000 registros son positivos (3.39%). "
+         "La clase mayoritaria alcanza 96.61%, por lo que accuracy aislada "
+         "es engañosa. No existen valores nulos ni duplicados exactos. "
+         "El método IQR señala 418 posibles valores extremos en velocidad "
+         "y 69 en torque. Se conservaron: un valor extremo operativo "
+         "puede ser precisamente una señal de falla. Las figuras 1 a 4 "
+         "documentan desbalance, completitud y patrones; las variables "
+         "numéricas fueron tratadas dentro del Pipeline para evitar fuga.")
     header("4. Protocolo de entrenamiento y búsqueda")
     para("Cada algoritmo se entrenó solo con train, usando "
          "StratifiedKFold(n_splits=5, shuffle=True, random_state=42). "
@@ -204,6 +227,23 @@ def document(require_screenshots: bool = False) -> Path:
            for _, row in comparison.iterrows()],
           widths=[5*cm, 3.8*cm, 4*cm, 3.5*cm])
 
+
+    para("JUSTIFICACIÓN: con 3.39% de fallas, se optimizó Average Precision "
+         "en la validación cruzada, en lugar de accuracy; posteriormente "
+         "se seleccionó el umbral operativo maximizando F2 con precision "
+         "mínima de 0.50 si existía configuración factible. "
+         "Esto penaliza especialmente fallas no detectadas sin "
+         "ocultar el incremento de alertas falsas.")
+    table(["Modelo", "Hiperparámetros elegidos por Grid Search"], [
+        [row["Modelo"], str(json.loads(row["best_params_json"]))]
+        for _, row in comparison.iterrows()
+    ], widths=[4.8*cm, 11.5*cm])
+    para("La búsqueda evaluó 6 combinaciones de regresión logística "
+         "(3 valores de C y 2 ponderaciones) y 8 combinaciones de "
+         "Random Forest (2 árboles, 2 profundidades, 2 tamaños de hoja): "
+         "14 candidatos por cinco folds, 70 ajustes de CV. "
+         "El pipeline reentrenó cada mejor configuración sobre train; "
+         "la validación externa ajustó el umbral sin utilizar test.")
     header("5. Experimentos reproducibles con MLflow")
     para(f"Se registraron {run_manifest['numero_runs']} runs "
          f"({run_manifest['runs_hijos']} combinaciones hijas) en el experimento "
@@ -211,6 +251,14 @@ def document(require_screenshots: bool = False) -> Path:
          "los mejores modelos completos y sus resultados de validación y prueba; "
          "los hijos preservan parámetros y promedios de validación cruzada. "
          "Las tablas exportadas son consultables en evidencias/mlflow/.")
+
+    para("Para la trazabilidad, cada candidato tiene run hijo con "
+         "parámetros, media/desviación del Average Precision de CV "
+         "y ranking; cada run padre conserva el pipeline completo, "
+         "tablas, figuras y el resultado de prueba. El experimento "
+         "se ejecutó en el servidor MLflow local; los 17 runs "
+         "también se publican como CSV porque localhost es inaccesible "
+         "para el evaluador. La evidencia visual se documenta abajo.")
     if missing_captures:
         para("<b>Advertencia:</b> faltan capturas de la interfaz real de MLflow: "
              + txt(", ".join(missing_captures)) + ". Este PDF es preliminar.")
@@ -245,6 +293,26 @@ def document(require_screenshots: bool = False) -> Path:
          f"{row['test_roc_auc']:.3f}"]
         for _, row in comparison.iterrows()
     ], widths=[4.6*cm, 2.0*cm, 2.0*cm, 1.7*cm, 1.7*cm, 2.1*cm, 2.2*cm])
+
+    para("LECTURA CUANTITATIVA DE TEST: Random Forest detectó "
+         "39 de 51 fallas; regresión logística detectó 17. "
+         "Se redujeron los falsos negativos de 34 a 12 "
+         "(22 fallas adicionales identificadas; 64.7% menos omisiones). "
+         "En contraparte, las falsas alertas subieron de 15 a 33 "
+         "(18 inspecciones potenciales adicionales). "
+         "La precisión fue semejante (54.17% frente a 53.12%), "
+         "mientras que el recall pasó de 33.33% a 76.47%. "
+         "En test la mejora absoluta de F1 fue 22.45 puntos porcentuales.")
+    table(["Modelo", "TP", "FN", "FP", "TN", "Balanced acc."], [
+        [row["Modelo"], int(row["test_tp"]), int(row["test_fn"]),
+         int(row["test_fp"]), int(row["test_tn"]),
+         f"{row['test_balanced_accuracy']:.4f}"]
+        for _, row in comparison.iterrows()
+    ], widths=[4.5*cm, 2*cm, 2*cm, 2*cm, 2*cm, 3.8*cm])
+    para("BASELINE: DummyClassifier alcanzó 96.6% de accuracy en test "
+         "prediciendo siempre 'sin falla', pero recall = 0, F1 = 0 "
+         "y Balanced Accuracy = 0.50. Por tanto, una accuracy "
+         "superior a 96% no prueba utilidad del clasificador.")
     figure("05_06_comparacion_modelos.png",
            "Figura 3. Comparación de validación y prueba; inspeccionar la posible sensibilidad al umbral.")
     figure("07_08_curvas_pr_roc.png",
@@ -264,6 +332,14 @@ def document(require_screenshots: bool = False) -> Path:
             "no constituye validación industrial ni confirmación fuera de la muestra."))
     figure("10_bootstrap_f1.png", "Figura 6. Variación de la diferencia F1 por bootstrap pareado.")
 
+
+    para("INCERTIDUMBRE: la diferencia F1 a favor de Random Forest "
+         "fue 0.2245 (22.45 puntos); el bootstrap pareado percentil "
+         "de 2,000 remuestreos produjo IC95 [0.0897, 0.3668]. "
+         "El intervalo excluye cero bajo este procedimiento, "
+         "pero los casos positivos son únicamente 51, pertenecen "
+         "a un dataset sintético y no existe prueba temporal "
+         "ni industrial; no se infiere superioridad universal.")
     header("8. Recursos, deuda técnica y enfoque MLOps")
     table(["Modelo", "Tiempo GridSearch (s)", "Latencia por registro (ms)"], [
         [row["Modelo"], f"{row['cv_fit_seconds']:.2f}",
@@ -275,6 +351,28 @@ def document(require_screenshots: bool = False) -> Path:
          "Acciones MLOps: versionar datos/pipelines, registrar nuevos datasets "
          "y modelos en MLflow, definir reglas de promoción, monitorear métricas "
          "por segmento, revisar drift, auditar alertas y mantener reversión humana.")
+
+    para("LECTURA DE EFICIENCIA Y GENERALIZACIÓN: Random Forest necesitó "
+         "25.90 s para Grid Search frente a 4.48 s de regresión "
+         "logística en el hardware observado (~5.8 veces más), "
+         "y 0.0366 frente a 0.0067 ms por registro de prueba. "
+         "La menor latencia de regresión logística no compensó "
+         "la omisión de 34 fallas. La configuración ganadora "
+         "de Random Forest obtuvo AP de entrenamiento cercano a 1.0, "
+         "frente a 0.7347 de CV: señal de posible sobreajuste "
+         "que exige validación externa antes de un despliegue.")
+    para("SENSIBILIDAD ECONÓMICA ILUSTRATIVA (sin equivalencia en pesos): "
+         "si una falsa alarma cuesta 1 unidad y una falla omitida "
+         "10 unidades, el costo observado sería RF = "
+         "33 + 10x12 = 153 y logística = 15 + 10x34 = 355. "
+         "Los costos de una planta real se desconocen; "
+         "estos números no justifican por sí solos invertir.")
+    para("PROPUESTA MLOps POR ETAPAS: (1) publicar manifests SHA256 "
+         "y modelo por versión, (2) automatizar pruebas y validación "
+         "de schema, (3) monitorear drift de velocidad, torque "
+         "y prevalencia de fallas, (4) medir recall/precision "
+         "por máquina y periodo, (5) definir rollback y aprobación "
+         "humana antes de cualquier acción sobre maquinaria.")
     header("9. Conclusión crítica")
     para(f"Con el protocolo preestablecido se seleccionó {txt(decisions['modelo_seleccionado'])} "
          "sobre validación, antes de evaluar test. El modelo seleccionado debe "
@@ -291,7 +389,23 @@ def document(require_screenshots: bool = False) -> Path:
         ["Responsabilidad humana", "Configuración, ejecución y revisión de resultados, "
          "interpretación académica y publicación final."],
     ], widths=[4.5*cm, 11.8*cm])
-    header("11. Bibliografía y recursos")
+
+    header("11. Evidencias, reproducibilidad y límites")
+    para("Repositorio: datos/datos_ini, datos/datos_limp, fuentes/train.py, "
+         "fuentes/entrena.ipynb, resultados/, evidencias/mlflow/ "
+         "y docs/Reporte_Tecnico_Actividad5.pdf. "
+         "Para reproducir: instalar requirements.txt, "
+         "iniciar MLflow en 127.0.0.1:5000, ejecutar "
+         "python -m fuentes.train y después "
+         "python -m fuentes.export_evidencias. "
+         "Los umbrales quedan congelados antes de calcular prueba.")
+    para("La actividad cubre un flujo académico de MLOps; NO se valida "
+         "tiempo hasta fallo, sensores reales, desgaste por activo, "
+         "causalidad, deriva futura, eficiencia bajo carga productiva "
+         "ni costos reales de mantenimiento. "
+         "No se almacenan tokens ni el SQLite privado en GitHub.")
+
+    header("12. Bibliografía y recursos")
     para("UCI AI4I 2020, DOI https://doi.org/10.24432/C5HS5C. "
          "Scikit-learn: https://scikit-learn.org/. "
          "MLflow Tracking: https://mlflow.org/docs/latest/ml/tracking/. "
