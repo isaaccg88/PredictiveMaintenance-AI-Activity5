@@ -1,0 +1,50 @@
+name: Ejecutar notebook de evidencias sin reentrenamiento
+
+on:
+  push:
+    paths:
+      - '.github/workflows/notebook-evidence.yml'
+      - 'fuentes/Evidencia_Ejecutada_Actividad5.ipynb'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  evidencias:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install jupyter nbconvert ipykernel
+      - name: Ejecutar notebook auditor sin crear runs MLflow
+        run: |
+          python -m jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=180 fuentes/Evidencia_Ejecutada_Actividad5.ipynb
+      - name: Validar todos los outputs verdaderos
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          n=json.loads(Path("fuentes/Evidencia_Ejecutada_Actividad5.ipynb").read_text(encoding="utf-8"))
+          codes=[x for x in n["cells"] if x["cell_type"]=="code"]
+          assert len(codes)>=6
+          assert all(x["execution_count"] is not None and x["outputs"] for x in codes)
+          assert not any(o["output_type"]=="error" for c in codes for o in c["outputs"])
+          print("Notebook ejecutado en entorno aislado:",len(codes),"celdas código, sin errores")
+          PY
+      - name: Publicar notebook con salidas reales
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add fuentes/Evidencia_Ejecutada_Actividad5.ipynb
+          if ! git diff --cached --quiet; then
+            git commit -m "docs: notebook de auditoría ejecutado con evidencias reales"
+            git push origin HEAD:main
+          fi
