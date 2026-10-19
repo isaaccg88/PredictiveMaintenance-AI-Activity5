@@ -1,0 +1,44 @@
+{
+  "fuente": "UCI AI4I 2020 Predictive Maintenance Dataset",
+  "doi": "10.24432/C5HS5C",
+  "licencia": "CC BY 4.0",
+  "url_descarga": "https://archive.ics.uci.edu/static/public/601/ai4i+2020+predictive+maintenance+dataset.zip",
+  "metodo": "descarga oficial UCI 601",
+  "fecha_verificacion_utc": "2026-10-19T01:10:27.574787+00:00",
+  "archivo_original_uci": "datos/datos_ini/uci_ai4i2020_original.csv",
+  "original_filas": 10000,
+  "original_columnas": 14,
+  "sha256_original_uci": "dc6630cd9b1f0f853922fad78a1b6436570d3f1ec863f1dd5c4340ac56bc8a8e",
+  "sha256_snapshot_7_cols": "ed347565ac389ce5acd66b2763065264b9aee8455793587b1d215cc3641772b4",
+  "comparacion_fila_a_fila": "APROBADA",
+  "diferencias_por_columna": {
+    "Type": 0,
+    "Air temperature": 0,
+    "Process temperature": 0,
+    "Rotational speed": 0,
+    "Torque": 0,
+    "Tool wear": 0,
+    "Machine failure": 0
+  },
+  "mapa_columnas_seleccionadas": {
+    "Type": "Type",
+    "Air temperature": "Air temperature [K]",
+    "Process temperature": "Process temperature [K]",
+    "Rotational speed": "Rotational speed [rpm]",
+    "Torque": "Torque [Nm]",
+    "Tool wear": "Tool wear [min]",
+    "Machine failure": "Machine failure"
+  },
+  "excluidas_por_identificador": [
+    "UDI",
+    "Product ID"
+  ],
+  "excluidas_por_fuga_de_objetivo": [
+    "TWF",
+    "HDF",
+    "PWF",
+    "OSF",
+    "RNF"
+  ],
+  "nota": "El dataset original es sintético; conservar el snapshot/particiones/experimentos existentes sin cambios."
+}
