@@ -1,0 +1,33 @@
+name: Verificar e incorporar dataset UCI original
+
+on:
+  push:
+    paths:
+      - '.github/workflows/uci-source.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  provenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: python -m pip install numpy==2.5.4 pandas==3.0.6 matplotlib==3.11.2
+      - name: Descargar oficial y verificar filas y columnas del snapshot
+        run: python -m fuentes.verificar_fuente_uci
+      - name: Publicar original y manifiesto
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add datos/datos_ini/uci_ai4i2020_original.csv docs/uci_source_manifest.json
+          if ! git diff --cached --quiet; then
+            git commit -m "data: versionar CSV original UCI y validar derivación académica"
+            git push origin HEAD:main
+          fi
